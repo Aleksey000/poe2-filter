@@ -1,0 +1,643 @@
+globalStyles:
+  list:
+    Hide:
+      show: false # TODO работет по уебански
+    Show:
+      show: true
+    curTierS:
+      fontSize: 45
+      textColor: 255 0 0 255
+      borderColor: 255 0 0 255
+      backgroundColor: 255 255 255 255
+      beam: Red
+      playAlertSound: {sound: 6, volume: 300}
+      minimapIcon:
+        size: 2
+        color: Red
+        type: Star
+    curTierA:
+      fontSize: 45
+      textColor: 255 255 255 255
+      borderColor: 255 255 255 255
+      backgroundColor: 240 90 35
+      beam: Yellow
+      playAlertSound: {sound: 1, volume: 300}
+      minimapIcon:
+        size: 2
+        color: Yellow
+        type: Circle
+    curTierB:
+      fontSize: 40
+      textColor: 0 0 0
+      borderColor: 0 0 0
+      backgroundColor: 240 90 35
+      beam: Yellow
+      playAlertSound: {sound: 2, volume: 300}
+      minimapIcon:
+        size: 1
+        color: Yellow
+        type: Circle
+    curTierC:
+      fontSize: 40
+      textColor: 0 0 0
+      borderColor: 0 0 0
+      backgroundColor: 249 150 25
+      beam: White
+      playAlertSound: {sound: 2, volume: 300}
+      minimapIcon:
+        size: 0
+        color: White
+        type: Circle
+    curTierD:
+      fontSize: 35
+      textColor: 0 0 0
+      borderColor: 0 0 0
+      backgroundColor: 213 159 0
+      beam: Grey
+      playAlertSound: {sound: 2, volume: 300}
+      minimapIcon:
+        size: 0
+        color: Grey
+        type: Circle
+    curTierE:
+      fontSize: 35
+      textColor: 0 0 0
+      borderColor: 0 0 0
+      backgroundColor: 210 178 135
+    curTierF:
+      fontSize: 35
+      textColor: 190 178 135
+      borderColor: 190 178 135
+      backgroundColor: 20 20 0
+    Wisdom:
+      fontSize: 25
+      textColor: 170 158 130
+      borderColor: 200 100 60
+      backgroundColor: 20 20 0
+    GoldS:
+      fontSize: 20
+      textColor: 180 180 180
+      borderColor: 0 0 0
+      backgroundColor: 20 20 0
+    GoldM:
+      fontSize: 23
+      textColor: 255 255 255
+      borderColor: 255 255 255 0
+      backgroundColor: 20 20 0
+    GoldL:
+      fontSize: 23
+      textColor: 255 255 255
+      borderColor: 255 255 255
+      backgroundColor: 20 20 0
+    GoldXl:
+      fontSize: 25
+      textColor: 255 255 255
+      borderColor: 255 255 255
+      backgroundColor: 20 20 0
+    GoldXxl:
+      fontSize: 30
+      textColor: 235 200 110
+      borderColor: 235 200 110
+      backgroundColor: 20 20 0
+      beam: Yellow Temp
+    iconGold:
+      minimapIcon:
+        size: 0
+        color: Grey
+        type: Cross
+    iconGoldXxl:
+      minimapIcon:
+        size: 1
+        color: Yellow
+        type: Cross
+
+  groups:
+    conditions:
+      list:
+    default:
+      groups:
+        sounds:
+          list:
+            lootTierSoundB:
+              playAlertSound: {sound: 2, volume: 300}
+            lootTierSoundA:
+              playAlertSound: {sound: 1, volume: 300}
+            lootTierSoundS:
+              playAlertSound: {sound: 6, volume: 300}
+            maps:
+              playAlertSound: {sound: 4, volume: 300}
+            goodMaps:
+              playAlertSound: {sound: 5, volume: 300}
+filterConfig:
+  groups:
+    currency:
+      list:
+        scrollofWisdom:
+          styleCustom:
+            show: false
+            baseType: {exact: true, value: ["Scroll of Wisdom"] }
+            class: {exact: true, value: ["Stackable Currency"] }
+          styles: [Hide, Wisdom]
+        GoldXxl:
+          styles: [ GoldXxl, iconGoldXxl ]
+          styleCustom:
+            baseType: { exact: true, value: [ "Gold" ] }
+            stackSize:
+              type: '>='
+              value: 3000
+        GoldXl:
+          styles: [ GoldXl, iconGold ]
+          styleCustom:
+            baseType: { exact: true, value: [ "Gold" ] }
+            stackSize:
+              type: '>='
+              value: 1000
+        GoldL:
+          styles: [ GoldL ]
+          styleCustom:
+            baseType: { exact: true, value: [ "Gold" ] }
+            stackSize:
+              type: '>='
+              value: 500
+        GoldM:
+          styles: [ GoldM ]
+          styleCustom:
+            baseType: { exact: true, value: [ "Gold" ] }
+            stackSize:
+              type: '>='
+              value: 50
+        GoldS:
+          styles: [GoldS]
+          styleCustom:
+            baseType: { exact: true, value: [ "Gold" ] }
+        curTierS:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Divine Orb",
+              "Perfect Jeweller's Orb",
+              "Mirror of Kalandra",
+              "Distilled Isolation",
+              "Distilled Suffering"
+            ] }
+          styles: [ curTierS ]
+        curTierA:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Orb of Annulment",
+              "Greater Jeweller's Orb",
+              "Chaos Orb",
+              "Exalted Orb",
+              "Exotic Coinage",
+              "Gemcutter's Prism",
+              "Glassblower's Bauble",
+              "Orb of Alchemy",
+              "Orb of Chance"
+            ] }
+          styles: [ curTierA ]
+        curTierB:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Arcanist's Etcher",
+              "Armourer's Scrap",
+              "Artificer's Orb",
+              "Black Scythe Artifact",
+              "Blacksmith's Whetstone",
+              "Broken Circle Artifact",
+              "Sun Artifact",
+              "Chance Shard",
+              "Order Artifact",
+              "Gold Key",
+              "Silver Key",
+              "Bronze Key"
+            ] }
+          styles: [ curTierB ]
+        curTierC:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Regal Orb",
+              "Alchemy Shard",
+              "Artificer's Shard",
+              "Lesser Jeweller's Orb",
+              "Vaal Orb"
+            ] }
+          styles: [ curTierC ]
+        curTierD:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Albino Rhoa Feather",
+              "Regal Shard"
+            ] }
+          styles: [ curTierD ]
+        curTierE:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Orb of Transmutation",
+              "Orb of Augmentation"
+            ] }
+          styles: [ curTierE ]
+        curTierF:
+          styleCustom:
+            class: { exact: true, value: ["Stackable Currency"] }
+            baseType: { exact: true, value: [
+              "Transmutation Shard"
+            ] }
+          styles: [ curTierF ]
+        essencesL:
+          styles: [ curTierC ]
+          styleCustom:
+            class: { exact: true, value: [ "Stackable Currency" ] }
+            baseType: { exact: false, value: [ 'Greater Essence of' ] }
+        essencesS:
+          styles: [ curTierD ]
+          styleCustom:
+            class: { exact: true, value: [ "Stackable Currency" ] }
+            baseType: { exact: false, value: ['Essence of']}
+        curUnknown:
+          styleCustom:
+            class: { exact: true, value: [ "Stackable Currency" ] }
+            fontSize: 45
+            textColor: 255 0 255 255
+            borderColor: 255 0 255 255
+            backgroundColor: 100 0 100 255
+            playAlertSound: {sound: 3, volume: 300}
+            beam: Pink
+            minimapIcon: { size: 0, color: Pink, type: Circle }
+    gems:
+      list:
+        skill:
+          styleCustom:
+            baseType: {exact: true, value: ["Uncut Support Gem"] }
+            fontSize: 35
+            textColor: 20 240 240
+            borderColor: 20 240 240
+            backgroundColor: 53 13 13 255
+            beam: Cyan
+            minimapIcon:
+              size: 1
+              color: Cyan
+              type: Triangle
+        spirit:
+          styleCustom:
+            baseType: { exact: true, value: [ "Uncut Spirit Gem" ] }
+            fontSize: 45
+            textColor: 20 240 240
+            borderColor: 20 240 240
+            backgroundColor: 53 13 13 255
+            beam: Cyan
+            playAlertSound: { sound: 2, volume: 300 }
+            minimapIcon:
+              size: 1
+              color: Cyan
+              type: Triangle
+        support:
+          styleCustom:
+            baseType: { exact: true, value: [ "Uncut Skill Gem" ] }
+            fontSize: 35
+            textColor: 20 240 240
+            borderColor: 20 240 240
+            backgroundColor: 53 13 13 255
+            playAlertSound: { sound: 2, volume: 300 }
+            #itemLevel: { type: '>=', value: 19 }
+            beam: Cyan
+            minimapIcon:
+              size: 1
+              color: Cyan
+              type: Triangle
+    gear:
+      list:
+        unique:
+          styleCustom:
+            rarity: Unique
+            fontSize: 40
+            textColor: 175 96 37 255
+            borderColor: 175 96 37 255
+            backgroundColor: 53 13 13 255
+            beam: Brown
+            playAlertSound: { sound: 3, volume: 300 }
+            minimapIcon:
+              size: 1
+              color: Brown
+              type: Star
+
+#        gearATierByClassNormal:
+#          styleCustom:
+#            class: { exact: true, value: [
+#              "Sceptres"
+#            ]}
+#            rarity: Normal
+#            fontSize: 35
+#            textColor: 200 200 200
+#            borderColor: 255 255 255
+#            backgroundColor: 20 20 0
+        gearATierByClassMagic:
+          styleCustom:
+            class: { exact: true, value: [
+              "Sceptres"
+            ]}
+            rarity: Magic
+            fontSize: 35
+            textColor: 136 136 255
+            borderColor: 255 255 255
+            backgroundColor: 0 0 0
+        gearATierByClassRare:
+          styleCustom:
+            class: { exact: true, value: [
+              "Sceptres"
+            ]}
+            rarity: Rare
+            fontSize: 35
+            textColor: 255 255 119
+            borderColor: 0 0 0 0
+            backgroundColor: 0 40 10 255
+
+#        gearATierByBaseNormal:
+#          styleCustom:
+#            baseType: { exact: true, value: [
+#              "Expert Plumed Focus",
+#              "Expert Crystal Focus",
+#              "Expert Antler Focus",
+#              "Advanced Plumed Focus",
+#              "Advanced Voodoo Focus",
+#
+#              "Expert Intricate Gloves",
+#              "Expert Jewelled Gloves",
+#              "Expert Sombre Gloves",
+#              "Advanced Intricate Gloves",
+#
+#              "Expert Feathered Sandals",
+#              "Expert Silk Slippers",
+#              "Expert Wrapped Sandals",
+#              "Advanced Feathered Sandals",
+#
+#              "Expert Altar Robe",
+#              "Expert Keth Raiment",
+#              "Expert Hexer's Robe",
+#
+#              "Expert Feathered Tiara",
+#              "Expert Chain Tiara",
+#              "Expert Wicker Tiara",
+#              "Advanced Feathered Tiara",
+#            ] }
+#            rarity: Normal
+#            fontSize: 35
+#            textColor: 200 200 200
+#            borderColor: 255 255 255
+#            backgroundColor: 20 20 0
+#            minimapIcon:
+#              size: 0
+#              color: White
+#              type: Circle
+        gearATierByBaseMagic:
+          styleCustom:
+            baseType: { exact: true, value: [
+              "Expert Plumed Focus",
+              "Expert Crystal Focus",
+              "Expert Antler Focus",
+              "Advanced Plumed Focus",
+              "Advanced Voodoo Focus",
+
+              "Expert Intricate Gloves",
+              "Expert Jewelled Gloves",
+              "Expert Sombre Gloves",
+              "Advanced Intricate Gloves",
+
+              "Expert Feathered Sandals",
+              "Expert Silk Slippers",
+              "Expert Wrapped Sandals",
+              "Advanced Feathered Sandals",
+
+              "Expert Altar Robe",
+              "Expert Keth Raiment",
+              "Expert Hexer's Robe",
+
+              "Expert Feathered Tiara",
+              "Expert Chain Tiara",
+              "Expert Wicker Tiara",
+              "Advanced Feathered Tiara",
+            ] }
+            rarity: Magic
+            fontSize: 35
+            textColor: 136 136 255
+            borderColor: 255 255 255
+            backgroundColor: 0 0 0
+            minimapIcon:
+              size: 0
+              color: White
+              type: Circle
+        gearATierByBaseRare:
+          styleCustom:
+            baseType: { exact: true, value: [
+              "Expert Plumed Focus",
+              "Expert Crystal Focus",
+              "Expert Antler Focus",
+              "Advanced Plumed Focus",
+              "Advanced Voodoo Focus",
+
+              "Expert Intricate Gloves",
+              "Expert Jewelled Gloves",
+              "Expert Sombre Gloves",
+              "Advanced Intricate Gloves",
+
+              "Expert Feathered Sandals",
+              "Expert Silk Slippers",
+              "Expert Wrapped Sandals",
+              "Advanced Feathered Sandals",
+
+              "Expert Altar Robe",
+              "Expert Keth Raiment",
+              "Expert Hexer's Robe",
+
+              "Expert Feathered Tiara",
+              "Expert Chain Tiara",
+              "Expert Wicker Tiara",
+              "Advanced Feathered Tiara",
+            ] }
+            rarity: Rare
+            fontSize: 35
+            textColor: 255 255 119
+            borderColor: 0 0 0 0
+            backgroundColor: 0 40 10 255
+            playAlertSound: { sound: 2, volume: 300 }
+            minimapIcon:
+              size: 1
+              color: Yellow
+              type: Circle
+
+        hideGearNormal:
+          styleCustom:
+            rarity: <= Magic
+            class: { exact: true, value: [
+              "Claws", "Daggers", "Wands", "One Hand Swords", "One Hand Axes", "One Hand Maces", "Spears", "Flails",
+              "Bows", "Staves", "Two Hand Swords", "Two Hand Axes", "Two Hand Maces", "Quarterstaves", "Crossbows", "Traps", "Fishing Rods",
+              "Quivers", "Shields", "Foci",
+              "Gloves", "Boots", "Body Armours", "Helmets",
+              "Life Flasks", "Mana Flasks",
+            ]}
+            sockets: { type: '', value: 0 }
+            quality: { type: '', value: 0 }
+            fontSize: 10
+
+        allGearNormal:
+          styleCustom:
+            class: { exact: true, value: [
+              # One Handed Weapons
+              "Claws", "Daggers", "Wands", "One Hand Swords", "One Hand Axes", "One Hand Maces", "Sceptres", "Spears", "Flails",
+              # Two Handed Weapons
+              "Bows", "Staves", "Two Hand Swords", "Two Hand Axes", "Two Hand Maces", "Quarterstaves", "Crossbows", "Traps", "Fishing Rods",
+              # Off-hand
+              "Quivers", "Shields", "Foci",
+              # Armour
+              "Gloves", "Boots", "Body Armours", "Helmets",
+              # Jewellery
+              #"Amulet", "Ring", "Belt",
+              # Flask
+              "Life Flasks", "Mana Flasks", "Charms",
+            ]}
+            rarity: Normal
+            fontSize: 27
+            textColor: 200 200 200
+            borderColor: 0 0 0
+            backgroundColor: 20 20 0
+        allGearMagic:
+          styleCustom:
+            class: { exact: true, value: [
+              # One Handed Weapons
+              "Claws", "Daggers", "Wands", "One Hand Swords", "One Hand Axes", "One Hand Maces", "Sceptres", "Spears", "Flails",
+              # Two Handed Weapons
+              "Bows", "Staves", "Two Hand Swords", "Two Hand Axes", "Two Hand Maces", "Quarterstaves", "Crossbows", "Traps", "Fishing Rods",
+              # Off-hand
+              "Quivers", "Shields", "Foci",
+              # Armour
+              "Gloves", "Boots", "Body Armours", "Helmets",
+              # Jewellery
+              #"Amulet", "Ring", "Belt",
+              # Flask
+              "Life Flasks", "Mana Flasks", "Charms",
+            ]}
+            rarity: Magic
+            fontSize: 27
+            textColor: 136 136 255
+            borderColor: 0 0 0
+            backgroundColor: 0 0 0
+        allGearRare:
+          styleCustom:
+            class: { exact: true, value: [
+              # One Handed Weapons
+              "Claws", "Daggers", "Wands", "One Hand Swords", "One Hand Axes", "One Hand Maces", "Sceptres", "Spears", "Flails",
+              # Two Handed Weapons
+              "Bows", "Staves", "Two Hand Swords", "Two Hand Axes", "Two Hand Maces", "Quarterstaves", "Crossbows", "Traps", "Fishing Rods",
+              # Off-hand
+              "Quivers", "Shields", "Foci",
+              # Armour
+              "Gloves", "Boots", "Body Armours", "Helmets",
+              # Jewellery
+              #"Amulet", "Ring", "Belt",
+              # Flask
+              "Life Flasks", "Mana Flasks", "Charms",
+            ]}
+            rarity: Rare
+            fontSize: 30
+            textColor: 255 255 119
+            borderColor: 20 20 0
+            backgroundColor: 20 20 0
+
+        jewelleryNormal:
+          styleCustom:
+            class: { exact: true, value: [
+              "Amulet", "Ring", "Belt",
+            ]}
+            rarity: Normal
+            fontSize: 35
+            textColor: 200 200 200
+            borderColor: 255 255 255
+            backgroundColor: 20 20 0
+        jewelleryMagic:
+          styleCustom:
+            class: { exact: true, value: [
+              "Amulet", "Ring", "Belt",
+            ]}
+            rarity: Magic
+            fontSize: 35
+            textColor: 136 136 255
+            borderColor: 255 255 255
+            backgroundColor: 0 0 0
+        jewelleryRare:
+          styleCustom:
+            class: { exact: true, value: [
+              "Amulet", "Ring", "Belt",
+            ]}
+            rarity: Rare
+            fontSize: 35
+            textColor: 255 255 119
+            borderColor: 0 0 0 0
+            backgroundColor: 0 40 10 255
+
+    socketable:
+      list:
+        runes:
+          styles: [curTierD]
+          styleCustom:
+            class: { exact: true, value: [ "Socketable" ] }
+    expedition:
+      list:
+        logbooks:
+          styleCustom:
+            class: { exact: true, value: ["Expedition Logbooks"] }
+            playAlertSound: { sound: 5, volume: 300 }
+            fontSize: 35
+            textColor: 255 85 85 255
+            borderColor: 255 85 85 255
+            backgroundColor: 40 0 30 255
+            minimapIcon: { size: 1, color: Yellow, type: UpsideDownHouse }
+            beam: Yellow
+    waystones:
+      list:
+        red:
+          styleCustom:
+            class: { exact: true, value: ["Waystones"] }
+            waystoneTier: {type: '>', value: 10}
+            fontSize: 35
+            textColor: 0 0 0 255
+            borderColor: 255 0 0 255
+            backgroundColor: 200 200 200 255
+            minimapIcon: { size: 1, color: Red, type: Square }
+            beam: Red
+            playAlertSound: { sound: 5, volume: 300 }
+        yellow:
+          styleCustom:
+            class: { exact: true, value: ["Waystones"] }
+            waystoneTier: {type: '>', value: 5}
+            fontSize: 35
+            textColor: 255 255 113
+            borderColor: 255 255 113
+            backgroundColor: 0 0 0 255
+            minimapIcon: { size: 1, color: Yellow, type: Square }
+            beam: Yellow
+            playAlertSound: { sound: 5, volume: 300 }
+        white:
+          styleCustom:
+            class: { exact: true, value: ["Waystones"] }
+            fontSize: 25
+            textColor: 255 255 255
+            borderColor: 255 255 255 255
+            backgroundColor: 0 0 0 255
+            minimapIcon: { size: 1, color: White, type: Square }
+            beam: White
+            playAlertSound: { sound: 5, volume: 300 }
+    end:
+      list:
+        unknown:
+          styleCustom:
+            fontSize: 45
+            textColor: 255 0 255 255
+            borderColor: 255 0 255 255
+            backgroundColor: 100 0 100 255
+            playAlertSound: { sound: 3, volume: 300 }
+            beam: Pink
+            minimapIcon: { size: 0, color: Pink, type: Circle }

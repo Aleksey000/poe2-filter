@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+
+<html itemscope itemtype="https://schema.org/QAPage" class="html__responsive " lang="en">
+
+    <head>
+        <!--https://stackoverflow.com/questions/9043765/how-to-parse-yaml-in-the-browser-->
+        <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+        <script></script>
+        <script type="text/javascript">
+            function generateFilter() {
+                let filterConfigJson = document.getElementById("config").value
+                let filterConfig = jsyaml.load(filterConfigJson);
+
+                let {globalStyles, filterConfig: config} = filterConfig || {}
+
+                filterStyles = {}
+                initStyles(filterStyles, (globalStyles || {}))
+
+
+                let poeFilter = generateLootFilter1(config)
+                let lootFilterText = generateLootFilterString(poeFilter)
+
+                document.getElementById("filter").value = lootFilterText
+            }
+
+            function initStyles(stylesMap, styles) {
+                let {list, groups} = styles || {};
+
+                Object.entries(list || {}).forEach(item => {
+                    let [name, style] = item || []
+
+                    if (!!stylesMap[name]) {
+                        throw new Error("Styles with name '" + name + "' already exist");
+                    }
+
+                    stylesMap[name] = style
+                })
+
+                Object.entries(groups || {}).forEach(item => {
+                    let [name, group] = item || []
+                    initStyles(stylesMap, group);
+                })
+            }
+
+            function generateLootFilter1(node) {
+                let result = [];
+
+                let {list, groups} = node || {};
+
+                Object.entries(list || {}).forEach(item => {
+                    let [name, subNode] = item || []
+
+                    result.push(generateLootFilter2(name, subNode))
+                })
+
+                Object.entries(groups || {}).forEach(item => {
+                    let [name, subNode] = item || []
+
+                    result = result.concat(generateLootFilter1(subNode))
+                })
+
+                return result
+            }
+
+            function generateLootFilter2(name, subNode) {
+                let poeFilter = getNewPoeFilter()
+
+
+                let {styleCustom, styles, rules, enable: isEnable} = subNode
+
+                isEnable = isEnable === undefined || isEnable === null || isEnable === true
+                if (!isEnable){
+                    return null
+                }
+
+                let isShow = (styleCustom  || {}).show
+                isShow = isShow === undefined || isShow === null || isShow === true
+
+                poeFilter.show = isShow ? 'Show' : 'Hide';
+
+                if (!!styleCustom) {
+                    fillPoeFilter(poeFilter, styleCustom);
+                }
+
+                (styles || []).forEach(style => {
+                    fillPoeFilter(poeFilter, getStyle(style));
+                });
+
+                (rules || []).forEach(rule => {
+                    let isFillSubFilter = false;
+                    let subFilter = getNewPoeFilter();
+
+                    let {style, filterBlock} = rule
+
+                    if (!!style) {
+                        (style || []).forEach(value => {
+                            fillPoeFilter(subFilter, getStyle(value));
+                        })
+                    }
+
+                    if (!!filterBlock) {
+                        isFillSubFilter = true
+                        fillPoeFilter(subFilter, filterBlock);
+                    }
+
+                    if (isFillSubFilter) {
+                        poeFilter.subFilter.push(subFilter)
+                    }
+                })
+
+                return poeFilter;
+            }
+
+            function fillPoeFilter(poeFilter, style) {
+                let {
+                    enable,
+                    show,
+                    class: _class,
+                    baseType,
+                    rarity,
+                    areaLevel,
+                    stackSize,
+                    itemLevel,
+                    sockets,
+                    quality,
+                    waystoneTier,
+
+                    fontSize,
+                    textColor,
+                    borderColor,
+                    backgroundColor,
+                    playAlertSound,
+                    minimapIcon,
+                    beam
+
+                } = style
+
+                enable =  enable === undefined || enable === null || enable === true
+                if (!enable) {
+                    return
+                }
+
+                show =  show === undefined || show === null || show === true
+                poeFilter.putShow(show ? 'Show': 'Hide')
+
+                // Conditions blocks
+
+                if (!!_class) {
+                    let exactOperator = _class.exact === true ? "== " : "";
+                    let result = _class.value
+                        .map(item => {return '"' + item + '"'})
+                        .join(" ")
+                    poeFilter.putItemWithCheck('Class', exactOperator + result)
+                }
+
+                if (!!baseType) {
+                    let exactOperator = baseType.exact === true ? "== " : "";
+                    let result = baseType.value
+                        .map(item => {return '"' + item + '"'})
+                        .join(" ")
+                    poeFilter.putItemWithCheck('BaseType', exactOperator + result)
+                }
+
+                if (!!rarity) {
+                    poeFilter.putItem('Rarity', rarity)
+                }
+
+                if (!!areaLevel) {
+                    poeFilter.putItem('AreaLevel', areaLevel.type + ' ' + areaLevel.value)
+                }
+
+                if (!!stackSize) {
+                    poeFilter.putItem('StackSize', stackSize.type + ' ' + stackSize.value)
+                }
+
+                if (!!itemLevel) {
+                    poeFilter.putItem('ItemLevel', itemLevel.type + ' ' + itemLevel.value)
+                }
+
+                if (!!sockets) {
+                    poeFilter.putItem('Sockets', sockets.type + ' ' + sockets.value)
+                }
+
+                if (!!quality) {
+                    poeFilter.putItem('Quality', quality.type + ' ' + quality.value)
+                }
+
+                if (!!waystoneTier) {
+                    poeFilter.putItem('WaystoneTier', waystoneTier.type + ' ' + waystoneTier.value)
+                }
+
+                // Actions blocks
+
+                if (!!fontSize) {
+                    poeFilter.putItem('SetFontSize', fontSize)
+                }
+
+                if (!!textColor) {
+                    poeFilter.putItem('SetTextColor', textColor)
+                }
+
+                if (!!borderColor) {
+                    poeFilter.putItem('SetBorderColor', borderColor)
+                }
+
+                if (!!backgroundColor) {
+                    poeFilter.putItem('SetBackgroundColor', backgroundColor)
+                }
+
+                if (!!playAlertSound) {
+                    poeFilter.putItem('PlayAlertSound', playAlertSound.sound + ' ' + playAlertSound.volume)
+                }
+
+                if (!!minimapIcon) {
+                    poeFilter.putItem('MinimapIcon', minimapIcon.size + ' ' + minimapIcon.color + ' ' + minimapIcon.type)
+                }
+
+                if (!!beam) {
+                    poeFilter.putItem('PlayEffect', beam)
+                }
+            }
+
+            function getStyle(style) {
+                if (!filterStyles[style]) {
+                    throw new Error("Global style not founded " + style);
+                }
+                return filterStyles[style]
+            }
+
+            function generateLootFilterString(poeFilters) {
+                let filterStr = ""
+                poeFilters.forEach(poeFilter => {
+                    let str = poeFilterToString("", poeFilter, "");
+                    filterStr += str
+                })
+                return filterStr
+            }
+
+            function poeFilterToString(filterStr, poeFilter, level) {
+                filterStr += level
+                filterStr += poeFilter.show
+                filterStr += "\n"
+
+                let {items, subFilter} = poeFilter
+
+                Object.entries(items || {}).forEach(item => {
+                    let [key, value] = item || [];
+
+                    filterStr += "  "
+                    filterStr += level
+                    filterStr += key
+                    filterStr += " "
+                    filterStr += value
+                    filterStr += "\n"
+                });
+
+                let subFiltersList = [];
+                (subFilter || []).forEach(item => {
+                    let subFilterStr = poeFilterToString("", item, level + "  ");
+                    subFiltersList.push(subFilterStr);
+                });
+
+                if (subFiltersList.length === 0) {
+
+                } else {
+                    filterStr += level
+                    filterStr += "  "
+                    filterStr += "Continue\n\n"
+                    filterStr += subFiltersList.join(level + "    " + "Continue\n\n")
+                }
+
+                if (level === "") {
+                    filterStr += "\n"
+                }
+
+                return filterStr
+            }
+
+            function getNewPoeFilter() {
+                return {
+                    show: null,
+                    items: {},
+                    subFilter: [],
+                    putShow: function (show) {
+                        if (!this.show) {
+                            this.show = show
+                        }
+                    },
+                    putItem: function (item, value) {
+                        this.items[item] = value
+                    },
+                    putItemWithCheck: function (item, value) {
+                        if (!!this.items[item]) {
+                            throw new Error("Item " + item + " already set")
+                        }
+                        this.items[item] = value
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div>
+            <button class="favorite styled" type="button" onclick="generateFilter()">Generate</button>
+        </div>
+
+        <br>
+
+        <div>
+            errorlog
+        </div>
+
+        <br>
+
+        <div>
+            <textarea id="config" name="config" rows="50" cols="100">
+                {
+    "globalStyles": {
+        "list": {
+            "Hide": {
+                "show": false
+            },
+            "Show": {
+                "show": true
+            }
+        },
+        "groups": {
+            "conditions": {
+                "list": null
+            },
+            "default": {
+                "groups": {
+                    "sounds": {
+                        "list": {
+                            "lootTierSoundB": {
+                                "playAlertSound": {
+                                    "sound": 2,
+                                    "volume": 300
+                                }
+                            },
+                            "lootTierSoundA": {
+                                "playAlertSound": {
+                                    "sound": 1,
+                                    "volume": 300
+                                }
+                            },
+                            "lootTierSoundS": {
+                                "playAlertSound": {
+                                    "sound": 6,
+                                    "volume": 300
+                                }
+                            },
+                            "maps": {
+                                "playAlertSound": {
+                                    "sound": 4,
+                                    "volume": 300
+                                }
+                            },
+                            "goodMaps": {
+                                "playAlertSound": {
+                                    "sound": 5,
+                                    "volume": 300
+                                }
+                            }
+                        }
+                    },
+                    "icons": {
+                        "list": {
+                            "iconGreyCircleS": {
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "Grey",
+                                    "type": "Circle"
+                                }
+                            },
+                            "iconWhiteCircleS": {
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "White",
+                                    "type": "Circle"
+                                }
+                            },
+                            "iconYellowCircleM": {
+                                "minimapIcon": {
+                                    "size": 1,
+                                    "color": "Yellow",
+                                    "type": "Circle"
+                                }
+                            },
+                            "iconRedCircleL": {
+                                "minimapIcon": {
+                                    "size": 2,
+                                    "color": "Red",
+                                    "type": "Circle"
+                                }
+                            },
+                            "iconRedStarL": {
+                                "minimapIcon": {
+                                    "size": 1,
+                                    "color": "Red",
+                                    "type": "Star"
+                                }
+                            },
+                            "iconGold": {
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "Grey",
+                                    "type": "Cross"
+                                }
+                            },
+                            "iconGoldXxl": {
+                                "minimapIcon": {
+                                    "size": 1,
+                                    "color": "Yellow",
+                                    "type": "Cross"
+                                }
+                            }
+                        }
+                    },
+                    "beams": {
+                        "list": {
+                            "beamRed": {
+                                "beam": "Red Temp"
+                            },
+                            "beamWhite": {
+                                "beam": "White"
+                            },
+                            "beamYellow": {
+                                "beam": "Yellow"
+                            },
+                            "beamGrey": {
+                                "beam": "Grey"
+                            }
+                        }
+                    },
+                    "currency": {
+                        "list": {
+                            "Wisdom": {
+                                "fontSize": 25,
+                                "textColor": "170 158 130",
+                                "borderColor": "200 100 60",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "CurrencyTierF": {
+                                "fontSize": 35,
+                                "textColor": "190 178 135",
+                                "borderColor": "190 178 135",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "CurrencyTierE": {
+                                "fontSize": 35,
+                                "textColor": "0 0 0",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "210 178 135"
+                            },
+                            "CurrencyTierD": {
+                                "fontSize": 35,
+                                "textColor": "0 0 0",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "213 159 0"
+                            },
+                            "CurrencyTierC": {
+                                "fontSize": 40,
+                                "textColor": "0 0 0",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "249 150 25"
+                            },
+                            "CurrencyTierB": {
+                                "fontSize": 40,
+                                "textColor": "0 0 0",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "240 90 35"
+                            },
+                            "CurrencyTierA": {
+                                "fontSize": 45,
+                                "textColor": "255 255 255",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "240 90 35"
+                            },
+                            "CurrencyTierS": {
+                                "fontSize": 45,
+                                "textColor": "255 0 0",
+                                "borderColor": "255 0 0",
+                                "backgroundColor": "255 255 255"
+                            },
+                            "GoldS": {
+                                "fontSize": 20,
+                                "textColor": "180 180 180",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "GoldM": {
+                                "fontSize": 23,
+                                "textColor": "255 255 255",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "GoldL": {
+                                "fontSize": 23,
+                                "textColor": "255 255 255",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "GoldXl": {
+                                "fontSize": 25,
+                                "textColor": "255 255 255",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "GoldXxl": {
+                                "fontSize": 30,
+                                "textColor": "235 200 110",
+                                "borderColor": "235 200 110",
+                                "backgroundColor": "20 20 0",
+                                "beam": "Yellow Temp"
+                            }
+                        }
+                    },
+                    "gear": {
+                        "list": {
+                            "normalGearA": {
+                                "fontSize": 35,
+                                "textColor": "200 200 200",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "20 20 0",
+                                "beam": "Grey",
+                                "playAlertSound": {
+                                    "sound": 2,
+                                    "volume": 300
+                                },
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "Grey",
+                                    "type": "Diamond"
+                                }
+                            },
+                            "magicGearA": {
+                                "fontSize": 25,
+                                "textColor": "136 136 255",
+                                "borderColor": "255 255 255",
+                                "backgroundColor": "0 0 0",
+                                "beam": "Blue",
+                                "playAlertSound": {
+                                    "sound": 2,
+                                    "volume": 300
+                                },
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "Blue",
+                                    "type": "Diamond"
+                                }
+                            },
+                            "rareGearA": {
+                                "fontSize": 25,
+                                "textColor": "255 255 119",
+                                "borderColor": "255 176 119",
+                                "backgroundColor": "20 20 0",
+                                "beam": "Yellow",
+                                "playAlertSound": {
+                                    "sound": 2,
+                                    "volume": 300
+                                },
+                                "minimapIcon": {
+                                    "size": 0,
+                                    "color": "Yellow",
+                                    "type": "Diamond"
+                                }
+                            },
+                            "normalGear": {
+                                "fontSize": 35,
+                                "textColor": "200 200 200",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "20 20 0"
+                            },
+                            "magicGear": {
+                                "fontSize": 25,
+                                "textColor": "136 136 255",
+                                "borderColor": "0 0 0",
+                                "backgroundColor": "0 0 0"
+                            },
+                            "rareGear": {
+                                "fontSize": 25,
+                                "textColor": "255 255 119",
+                                "borderColor": "20 20 0",
+                                "backgroundColor": "20 20 0"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "filterConfig": {
+        "groups": {
+            "currency": {
+                "list": {
+                    "scrollofWisdom": {
+                        "styleCustom": {
+                            "baseType": {
+                                "exact": true,
+                                "value": [
+                                    "Scroll of Wisdom"
+                                ]
+                            },
+                            "class": {
+                                "exact": true,
+                                "value": [
+                                    "Stackable Currency"
+                                ]
+                            }
+                        },
+                        "styles": [
+                            "Wisdom"
+                        ]
+                    },
+                    "gold": {
+                        "enable": true,
+                        "styles": [
+                            "GoldS",
+                            "iconGold"
+                        ],
+                        "styleCustom": {
+                            "baseType": {
+                                "exact": true,
+                                "value": [
+                                    "Gold"
+                                ]
+                            }
+                        },
+                        "rules": [
+                            {
+                                "style": [
+                                    "GoldM"
+                                ],
+                                "filterBlock": {
+                                    "stackSize": {
+                                        "type": ">=",
+                                        "value": 50
+                                    }
+                                }
+                            },
+                            {
+                                "style": [
+                                    "GoldL"
+                                ],
+                                "filterBlock": {
+                                    "stackSize": {
+                                        "type": ">=",
+                                        "value": 100
+                                    }
+                                }
+                            },
+                            {
+                                "style": [
+                                    "GoldXl"
+                                ],
+                                "filterBlock": {
+                                    "stackSize": {
+                                        "type": ">=",
+                                        "value": 500
+                                    }
+                                }
+                            },
+                            {
+                                "style": [
+                                    "iconGoldXxl",
+                                    "GoldXxl"
+                                ],
+                                "filterBlock": {
+                                    "stackSize": {
+                                        "type": ">=",
+                                        "value": 1000
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "orbofTransmutation": {
+                        "styleCustom": {
+                            "baseType": {
+                                "exact": true,
+                                "value": [
+                                    "Orb of Transmutation"
+                                ]
+                            }
+                        },
+                        "styles": [
+                            "CurrencyTierE"
+                        ]
+                    },
+                    "unique": {
+                        "styleCustom": {
+                            "rarity": "Unique",
+                            "fontSize": 45,
+                            "textColor": "175 96 37 255",
+                            "borderColor": "175 96 37 255",
+                            "backgroundColor": "53 13 13 255",
+                            "beam": "Brown",
+                            "playAlertSound": {
+                                "sound": 3,
+                                "volume": 300
+                            },
+                            "minimapIcon": {
+                                "size": 1,
+                                "color": "Brown",
+                                "type": "Star"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+            </textarea>
+
+            <textarea id="filter" name="filter" rows="50" cols="100">
+            filter
+            </textarea>
+        </div>
+
+    </body>
+</html>
