@@ -1,0 +1,52 @@
+{
+  "soundsDefault": {
+
+  },
+  "sounds": {
+    "0": {
+
+    }
+  },
+  "globalStyle": {
+    "0": {
+      "type": "folder",
+      "children": {
+        "0": {
+          "type": "block",
+          "filterBlock": {
+            "show": true
+          }
+        }
+      }
+    },
+    "1": {
+      "type": "block",
+      "filterBlock": {
+        "show": true
+      }
+    }
+  },
+  "filterBlocks": [
+      {
+        "type": "folder",
+        "name": "currency",
+        "children": [
+          {
+            "type": "block",
+            "name": "scrollofWisdom",
+            "filterBlock": {
+              "show": true
+            }
+          }
+        ]
+      },
+      {
+        "type": "folder",
+        "name": "gems",
+        "filterBlock": {
+          "show": true
+        }
+      }
+    ]
+
+}
