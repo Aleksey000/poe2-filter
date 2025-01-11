@@ -76,20 +76,29 @@ function App2() {
         console.log('onCheck', checkedKeys, info);
     };
 
-    const handleAdd = (parentKey: string, name: string, type: ConfigFilterNodeType) => {
-        const newNode = new ConfigFilterNode();
-
-        newNode.name = name;
-        newNode.type = type;
-        newNode.children = [];
-
-        const updatedTreeData = treeData.map((node) => {
-          if (node.name === parentKey) {
-            node.children = [...(node.children || []), newNode];
-          }
-          return node;
+    const updateTreeData = (
+        treeData: ConfigFilterNode[], 
+        parentKey: string, 
+        newNode: ConfigFilterNode
+    ): ConfigFilterNode[] => {
+        return treeData.map((node) => {
+            if (node.name === parentKey) {
+                node.children = [ ...(node.children || []), newNode ];
+            } else if (node.children) {
+                node.children = updateTreeData(node.children, parentKey, newNode);
+            }
+            return node;
         });
-    
+    };
+
+    const handleAdd = (parentKey: string, name: string, type: ConfigFilterNodeType) => {
+        const newNode: ConfigFilterNode = {
+            name,
+            type, // Это тип новой папки
+            children: []// Папка не содержит дочерних элементов по умолчанию
+        };
+        const updatedTreeData = updateTreeData(treeData, parentKey, newNode);
+        
         setTreeData(updatedTreeData);
     };
 
