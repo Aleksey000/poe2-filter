@@ -1,54 +1,101 @@
-import {Component} from "react";
-import {ConfigFilterNode} from "../ConfigFilterNode.tsx";
-import {Tree, TreeDataNode} from 'antd';
-import {ConfigFilterNodeType} from "../ConfigFilterNodeType.tsx";
-import {DownOutlined, FileOutlined, FolderOutlined, FileAddOutlined, FolderAddOutlined, MinusCircleOutlined} from "@ant-design/icons";
-
+import React, { useState } from "react";
+import { Tree, TreeDataNode, Modal, Input } from "antd";
+import {
+  FileOutlined,
+  FolderOutlined,
+  FileAddOutlined,
+  FolderAddOutlined,
+  MinusCircleOutlined,
+  DownOutlined
+} from "@ant-design/icons";
+import { ConfigFilterNode } from "../ConfigFilterNode.tsx";
+import { ConfigFilterNodeType } from "../ConfigFilterNodeType.tsx";
 
 interface ConfigFilterTreeProps {
-    treeData: ConfigFilterNode[]
+  treeData: ConfigFilterNode[];
+  onAdd?: (parentKey: string, folderName: string, type: ConfigFilterNodeType) => void | undefined;
+  onDeleteItem?: (parentKey: string, itemName: string) => void | undefined; 
 }
 
-function toAntTree(treeData: ConfigFilterNode[]): TreeDataNode[] {
-    if (!treeData) {
-        return [];
-    }
-    console.log(treeData)
-    return treeData.map(value => {
-        const {children: aaa} = value ;
-        const isFolder = value.type == ConfigFilterNodeType.FOLDER;
-        const treeDataNode: TreeDataNode = {
-            key: value.name,
-            title: <>
-                {value.name}
-                { isFolder ? (<>
-                    <FolderAddOutlined />
-                    <FileAddOutlined />
-                </>) : (<></>)}
-                <MinusCircleOutlined style={{color: "red"}} />
-            </>,
-            icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
-            children: !aaa ? [] : toAntTree(aaa)
-        };
+export function toAntTree(
+  data: ConfigFilterNode[],
+  onAddFolder: (parentKey: string, folderName: string) => void,
+  showAddModal: (parentKey: string, type: ConfigFilterNodeType) => void
+): TreeDataNode[] {
+  if (!data) {
+    return [];
+  }
 
-        return treeDataNode;
-    })
+  return data.map((value) => {
+    const { children } = value;
+    const isFolder = value.type === ConfigFilterNodeType.FOLDER;
+
+    const treeDataNode: TreeDataNode = {
+      key: value.name,
+      title: (
+        <>
+          {value.name}
+          {isFolder ? (
+            <>
+              <FolderAddOutlined
+                onClick={() => {
+                    showAddModal(value.name, ConfigFilterNodeType.FOLDER);
+                }}
+              />
+              <FileAddOutlined 
+                onClick={() => {
+                    showAddModal(value.name, ConfigFilterNodeType.FILTER_BLOCK);
+                }} />
+            </>
+          ) : null}
+          <MinusCircleOutlined
+            style={{ color: "red" }}
+            onClick={() => console.log("Click: Delete")}
+          />
+        </>
+      ),
+      icon: isFolder ? <FolderOutlined /> : <FileOutlined />,
+      children: children ? toAntTree(children, onAddFolder, showAddModal) : [],
+    };
+
+    return treeDataNode;
+  });
 }
 
-export default class ConfigFilterTree extends Component<ConfigFilterTreeProps> {
-    constructor(props: ConfigFilterTreeProps) {
-        super(props);
-    }
-    render() {
-        const {
-            treeData
-        } = this.props || {};
-
-        console.log(treeData);
-
-        const treeData2: TreeDataNode[] = toAntTree(treeData);
-
-        return <Tree
+const ConfigFilterTree = ({ treeData, onAdd }: ConfigFilterTreeProps) => {
+    const [ isModalVisible, setIsModalVisible ] = useState(false);
+    const [ folderName, setFolderName ] = useState('');
+    const [ parentKey, setParentKey ] = useState<string | null>(null);
+    const [ typeAdd, setTypeAdd ] = useState<ConfigFilterNodeType>(ConfigFilterNodeType.FILTER_BLOCK);
+  
+    const showAddModal = (parentKey: string, type: ConfigFilterNodeType) => {
+        setParentKey(parentKey);
+        setIsModalVisible(true);
+        setTypeAdd(type);
+    };
+  
+    const handleModalOk = () => {
+        if (folderName && parentKey) {
+            onAdd(parentKey, folderName, typeAdd);
+        }
+        setIsModalVisible(false); // Закрываем модальное окно
+        setFolderName(''); // Сбрасываем имя папки
+    };
+  
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+        setFolderName(''); // Сбрасываем имя папки
+    };
+  
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFolderName(e.target.value);
+    };
+  
+    const treeDataNodes = toAntTree(treeData, onAdd, showAddModal); // Передаем функцию для показа модалки
+  
+    return (
+      <div>
+        <Tree
             showLine
             showIcon
             defaultExpandAll
@@ -57,16 +104,22 @@ export default class ConfigFilterTree extends Component<ConfigFilterTreeProps> {
             // defaultSelectedKeys={['0-0-0', '0-0-1']}
             // defaultCheckedKeys={['0-0-0', '0-0-1']}
             // onSelect={onSelect}
-            treeData={treeData2}
+            treeData={treeDataNodes}
         />
-    }
+        <Modal
+            title="Добавить"
+            visible={isModalVisible}
+            onOk={handleModalOk}
+            onCancel={handleModalCancel}
+        >
+            <Input
+                placeholder="Введите название"
+                value={folderName}
+                onChange={handleInputChange}
+            />
+        </Modal>
+      </div>
+    );
+};
 
-    // private toAntTree(treeData: ConfigFilterNode[]) {
-    //     treeData.map(item => {
-    //         new TreeDataNode()
-    //     })
-    //     return [];
-    // }
-}
-
-
+export default ConfigFilterTree;
