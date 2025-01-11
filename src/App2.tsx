@@ -1,4 +1,4 @@
-// import React from 'react';
+import React, { useState } from 'react';
 import {Layout, theme, Splitter, Tree, Switch, Form, Checkbox, Input, Select, ColorPicker, Collapse} from 'antd';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -14,6 +14,7 @@ import filterText from '../other/filter2.yaml?raw';
 import filterTreeJson from '../other/filter-tree.json?raw';
 import ConfigFilterTree from "./tree/ConfigFilterTree.tsx";
 import {ConfigFilterNode} from "./ConfigFilterNode.tsx";
+import { ConfigFilterNodeType } from './ConfigFilterNodeType.tsx';
 
 const  {Content, Footer, Header} = Layout;
 
@@ -61,10 +62,11 @@ const treeData: TreeDataNode[] = [
 
 function App2() {
 
-    const test = JSON.parse(filterTreeJson).filterBlocks.map(item => Object.assign(new ConfigFilterNode(), item))
-    console.log(test);
+    const [treeData, setTreeData] = useState(
+        JSON.parse(filterTreeJson).filterBlocks.map((item) => Object.assign(new ConfigFilterNode(), item))
+    );
 
-    const {token: {colorPrimary}} = theme.useToken();
+    const { token: {colorPrimary} } = theme.useToken();
 
     const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         console.log('selected', selectedKeys, info);
@@ -72,6 +74,32 @@ function App2() {
 
     const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
         console.log('onCheck', checkedKeys, info);
+    };
+
+    const updateTreeData = (
+        treeData: ConfigFilterNode[], 
+        parentKey: string, 
+        newNode: ConfigFilterNode
+    ): ConfigFilterNode[] => {
+        return treeData.map((node) => {
+            if (node.name === parentKey) {
+                node.children = [ ...(node.children || []), newNode ];
+            } else if (node.children) {
+                node.children = updateTreeData(node.children, parentKey, newNode);
+            }
+            return node;
+        });
+    };
+
+    const handleAdd = (parentKey: string, name: string, type: ConfigFilterNodeType) => {
+        const newNode: ConfigFilterNode = {
+            name,
+            type, // Это тип новой папки
+            children: []// Папка не содержит дочерних элементов по умолчанию
+        };
+        const updatedTreeData = updateTreeData(treeData, parentKey, newNode);
+        
+        setTreeData(updatedTreeData);
     };
 
     return (
@@ -93,7 +121,8 @@ function App2() {
                                     key: '2',
                                     label: 'Global filter blocks',
                                     children: <ConfigFilterTree
-                                        treeData={test}
+                                        treeData={ treeData }
+                                        onAdd={ handleAdd }
                                     />,
                                 },
                                 // {
